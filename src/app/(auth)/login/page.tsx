@@ -1,0 +1,151 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Shield } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useAuthContext } from '@/contexts/auth-context';
+import { isSupabaseConfigured } from '@/lib/supabase/client';
+
+const loginSchema = z.object({
+  email: z.string().email('Enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useAuthContext();
+  const [loading, setLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
+
+  const onSubmit = async (data: LoginFormData) => {
+    setLoading(true);
+    setAuthError(null);
+    try {
+      const { error } = await login(data.email, data.password);
+      if (error) {
+        setAuthError(error);
+      } else {
+        router.push('/app/dashboard');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Left Panel */}
+      <div className="hidden lg:flex lg:w-[40%] bg-surface h-screen flex-col justify-between p-10 relative overflow-hidden">
+        <Link href="/" className="flex items-center gap-2.5 relative z-10">
+          <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+            <Shield className="w-4.5 h-4.5 text-accent-foreground" />
+          </div>
+          <span className="text-lg font-semibold text-text-primary">DebtGuard</span>
+        </Link>
+        <div className="max-w-sm relative z-10">
+          <blockquote className="text-xl font-light italic text-text-secondary leading-relaxed">
+            &ldquo;The first step toward financial freedom is understanding where you stand today.&rdquo;
+          </blockquote>
+        </div>
+        <div className="relative z-10" aria-hidden="true">
+          <div className="flex gap-3 opacity-40">
+            <div className="w-12 h-12 rounded-full border border-accent/20" />
+            <div className="w-8 h-8 rounded-full border border-accent/15 mt-2" />
+            <div className="w-16 h-16 rounded-full border border-accent/10 -mt-3" />
+          </div>
+        </div>
+        <div className="absolute top-1/3 left-1/4 w-64 h-64 rounded-full bg-accent/[0.04]" aria-hidden="true" />
+        <div className="absolute bottom-1/4 right-1/6 w-48 h-48 rounded-full bg-accent/[0.03]" aria-hidden="true" />
+      </div>
+
+      {/* Right Panel */}
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md mx-auto py-12 px-6">
+          <div className="lg:hidden mb-8">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                <Shield className="w-4.5 h-4.5 text-accent-foreground" />
+              </div>
+              <span className="text-lg font-semibold text-text-primary">DebtGuard</span>
+            </Link>
+          </div>
+
+          <h1 className="text-2xl font-bold text-text-primary">Welcome back.</h1>
+          <p className="mt-2 text-sm text-text-secondary">Sign in to your DebtGuard workspace.</p>
+
+          {!isSupabaseConfigured && (
+            <div className="mt-4 rounded-lg border border-accent/20 bg-accent/5 px-4 py-3">
+              <p className="text-sm font-medium text-text-primary">Local mode</p>
+              <p className="text-xs text-text-secondary mt-0.5">
+                Running without a database. Enter any email and password to continue — your data will be saved locally in this browser.
+              </p>
+            </div>
+          )}
+
+          {authError && (
+            <div className="mt-4 rounded-lg border border-danger/20 bg-danger/5 px-4 py-3">
+              <p className="text-sm text-danger">{authError}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">
+            <Input
+              label="Email"
+              type="email"
+              placeholder="you@example.com"
+              error={errors.email?.message}
+              {...register('email')}
+            />
+            <Input
+              label="Password"
+              type="password"
+              placeholder="••••••••"
+              error={errors.password?.message}
+              {...register('password')}
+            />
+
+            <div className="flex items-center justify-end">
+              <Link
+                href="/forgot-password"
+                className="text-sm text-accent hover:text-accent-hover transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <Button type="submit" size="lg" className="w-full" loading={loading}>
+              Sign In
+            </Button>
+          </form>
+
+          <div className="flex items-center gap-4 my-6">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-xs text-text-muted">or</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
+          <p className="text-sm text-text-secondary text-center">
+            Don&apos;t have an account?{' '}
+            <Link href="/signup" className="text-accent hover:text-accent-hover transition-colors">
+              Sign up
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,26 +1,363 @@
 @import "tailwindcss";
 
+/* ========================================
+   DebtGuard Design System — Dark-first
+   ======================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #111111;
+  --surface: #191919;
+  --surface-elevated: #18181b;
+  --surface-overlay: #2a2a2a;
+  --border: #201e18;
+  --border-subtle: #27272a;
+  --text-primary: #eeeeee;
+  --text-secondary: #b4b4b4;
+  --text-muted: #484848;
+  --accent: #ffe0c2;
+  --accent-hover: #ffe0c1;
+  --accent-subtle: #393028;
+  --accent-foreground: #202020;
+  --success: #10b981;
+  --success-subtle: #052e16;
+  --warning: #f59e0b;
+  --warning-subtle: #1c1400;
+  --danger: #e54d2e;
+  --danger-subtle: #1c0505;
+  --radius: 0.5rem;
+}
+
+.light {
+  --background: #f9f9f9;
+  --surface: #fcfcfc;
+  --surface-elevated: #efefef;
+  --surface-overlay: #e8e8e8;
+  --border: #d8d8d8;
+  --border-subtle: #ebebeb;
+  --text-primary: #202020;
+  --text-secondary: #646464;
+  --text-muted: #909090;
+  --accent: #644a40;
+  --accent-hover: #66493e;
+  --accent-subtle: #ffdfb5;
+  --accent-foreground: #ffffff;
+  --success: #10b981;
+  --success-subtle: #ecfdf5;
+  --warning: #f59e0b;
+  --warning-subtle: #fffbeb;
+  --danger: #e54d2e;
+  --danger-subtle: #fef2f2;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-foreground: var(--text-primary);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --radius-lg: var(--radius);
+  --radius-md: 8px;
+  --radius-sm: 6px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ========================================
+   Accent foreground utility
+   Guarantees correct text contrast on accent-colored backgrounds:
+   dark mode: #ffe0c2 bg → #202020 text (near-black)
+   light mode: #644a40 bg → #ffffff text (white)
+   ======================================== */
+
+.text-accent-foreground {
+  color: var(--accent-foreground);
+}
+
+/* ========================================
+   Base Resets
+   ======================================== */
+
+* {
+  border-color: var(--border);
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 200ms ease, color 200ms ease;
 }
+
+/* ========================================
+   Custom Scrollbar (thin, dark)
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Firefox thin scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+/* ========================================
+   Focus-Visible Ring
+   ======================================== */
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   Skeleton Shimmer Animation
+   ======================================== */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface) 25%,
+    var(--surface-elevated) 50%,
+    var(--surface) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ========================================
+   Glass / Blur Effect
+   ======================================== */
+
+.glass {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(10, 10, 11, 0.8);
+}
+
+.light .glass {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+/* ========================================
+   Recharts Tooltip Overrides
+   ======================================== */
+
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+.recharts-default-tooltip {
+  background: var(--surface-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.recharts-tooltip-label {
+  color: var(--text-secondary) !important;
+  font-size: 12px !important;
+  margin-bottom: 4px !important;
+}
+
+.recharts-tooltip-item {
+  color: var(--text-primary) !important;
+  font-size: 13px !important;
+}
+
+.recharts-cartesian-grid line {
+  stroke: var(--border-subtle) !important;
+}
+
+/* ========================================
+   Risk Pulse Glow Animation
+   ======================================== */
+
+@keyframes risk-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px 6px rgba(239, 68, 68, 0.25);
+  }
+}
+
+.risk-pulse {
+  animation: risk-pulse 2s ease-in-out infinite;
+}
+
+/* ========================================
+   Float Animation (Hero Mockup)
+   ======================================== */
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+/* ========================================
+   Count-Up Animation Utility
+   ======================================== */
+
+@property --num {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+.count-up {
+  transition: --num 1.5s ease-out;
+  counter-reset: num var(--num);
+}
+
+.count-up::after {
+  content: counter(num);
+}
+
+/* ========================================
+   Aurora / 3D Animation Keyframes
+   ======================================== */
+
+@keyframes aurora-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.20; }
+  33% { transform: translate(60px, -40px) scale(1.1); opacity: 0.25; }
+  66% { transform: translate(-30px, 30px) scale(0.95); opacity: 0.15; }
+}
+
+@keyframes aurora-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+  40% { transform: translate(-50px, 60px) scale(1.15); opacity: 0.20; }
+  70% { transform: translate(40px, -30px) scale(0.9); opacity: 0.12; }
+}
+
+@keyframes aurora-3 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.10; }
+  50% { transform: translate(30px, 50px) scale(1.2) rotate(15deg); opacity: 0.18; }
+}
+
+@keyframes shimmer-slide {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px 0px rgba(255, 224, 194, 0.3); }
+  50% { box-shadow: 0 0 40px 8px rgba(255, 224, 194, 0.5); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-aurora-1 { animation: aurora-1 12s ease-in-out infinite; }
+.animate-aurora-2 { animation: aurora-2 16s ease-in-out infinite; }
+.animate-aurora-3 { animation: aurora-3 20s ease-in-out infinite; }
+.animate-shimmer { animation: shimmer-slide 2.5s linear infinite; }
+.animate-glow-pulse { animation: glow-pulse 2s ease-in-out infinite; }
+.animate-gradient { animation: gradient-shift 6s ease infinite; background-size: 200% 200%; }
+
+/* Aria chat panel animations */
+@keyframes ring-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 224, 194, 0.5); }
+  50%       { box-shadow: 0 0 0 8px rgba(255, 224, 194, 0); }
+}
+.animate-ring-pulse { animation: ring-pulse 2s ease-in-out infinite; }
+
+@keyframes aria-dot-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 1; }
+}
+
+/* ========================================
+   Entrance Animations (CSS-only, no React dependency)
+   ======================================== */
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-in-right {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.anim-fade-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+  opacity: 0;
+}
+.anim-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+.anim-fade-right {
+  animation: fade-in-right 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.anim-delay-0  { animation-delay: 0ms; }
+.anim-delay-1  { animation-delay: 100ms; }
+.anim-delay-2  { animation-delay: 200ms; }
+.anim-delay-3  { animation-delay: 300ms; }
+.anim-delay-4  { animation-delay: 400ms; }
+.anim-delay-5  { animation-delay: 500ms; }
+.anim-delay-6  { animation-delay: 600ms; }
+.anim-delay-7  { animation-delay: 700ms; }
